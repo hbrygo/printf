@@ -6,115 +6,54 @@
 /*   By: hubrygo <hubrygo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 10:45:23 by hubrygo           #+#    #+#             */
-/*   Updated: 2023/04/12 15:57:46 by hubrygo          ###   ########.fr       */
+/*   Updated: 2023/04/13 17:59:56 by hubrygo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include <../19_libft/libft.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <unistd.h>
+#include "ft_printf.h"
 
-void	ft_putchar(char c)
-{
-	if (!c)
-		return ;
-	write(1, &c, 1);
-}
-
-void	ft_put_unsigned_nbr(unsigned int nb)
-{
-	unsigned int	num;
-
-	if (nb >= 10)
-	{
-		ft_put_unsigned_nbr(nb / 10);
-		ft_put_unsigned_nbr(nb % 10);
-	}
-	if (nb < 10)
-	{
-		num = nb + 48;
-		write (1, &num, 1);
-	}
-}
-
-void	ft_putnbr(int nb)
-{
-	int	num;
-
-	if (nb != -2147483648)
-	{
-		if (nb < 0)
-		{
-			write (1, "-", 1);
-			nb = -nb;
-		}
-		if (nb >= 10)
-		{
-			ft_putnbr(nb / 10);
-			nb = nb % 10;
-		}
-		if (nb < 10)
-		{
-			num = nb + 48;
-			write (1, &num, 1);
-		}
-	}
-	else
-	{
-		write (1, "-2147483648", 11);
-	}
-}
-
-void	ft_putstr(char *str)
-{
-	int	i;
-
-	if (!str)
-		return ;
-	i = 0;
-	while (str[i] != '\0')
-	{
-		write (1, &str[i], 1);
-		i++;
-	}
-}
-
-void	ft_putnbr_base(unsigned long int nb, int i)
+size_t	ft_put_unsigned_nbr_base(unsigned long long int nb, int i, size_t *len)
 {
 	if (nb >= 16)
 	{
-		ft_putnbr_base(nb / 16, i);
-		ft_putnbr_base(nb % 16, i);
+		ft_putnbr_base(nb / 16, i, len);
+		ft_putnbr_base(nb % 16, i, len);
 	}
 	if (nb < 16 && i == 1)
+	{
+		*len += 1;
 		ft_putchar("0123456789abcdef"[nb]);
+	}
 	if (nb < 16 && i == 2)
+	{
+		*len += 1;
 		ft_putchar("0123456789ABCDEF"[nb]);
+	}
+	return (*len);
 }
 
-int	ft_hub(char c, va_list lst)
+int	ft_hub(char c, va_list lst, size_t i)
 {
 	if (c == 'c')
-		ft_putchar(va_arg(lst, int));
-	if (c == 's')
-		ft_putstr(va_arg(lst, char *));
-	if (c == 'd' || c == 'i')
-		ft_putnbr(va_arg(lst, int));
-	if (c == 'u')
-		ft_put_unsigned_nbr(va_arg(lst, unsigned int));
-	if (c == 'p')
+		i += ft_putchar(va_arg(lst, int));
+	else if (c == 's')
+		i += ft_putstr(va_arg(lst, char *));
+	else if (c == 'd' || c == 'i')
+		ft_putnbr(va_arg(lst, int), &i);
+	else if (c == 'u')
+		ft_put_unsigned_nbr(va_arg(lst, unsigned int), &i);
+	else if (c == 'p')
 	{
-		ft_putstr("0x");
-		ft_putnbr_base(va_arg(lst, unsigned long), 1);
+		i += ft_putstr("0x");
+		ft_put_unsigned_nbr_base(va_arg(lst, unsigned long long int), 1, &i);
 	}
-	if (c == 'x')
-		ft_putnbr_base(va_arg(lst, unsigned long), 1);
-	if (c == 'X')
-		ft_putnbr_base(va_arg(lst, unsigned long), 2);
-	if (c == '%')
-		ft_putchar('%');
-	return (1);
+	else if (c == 'x')
+		ft_putnbr_base(va_arg(lst, unsigned int), 1, &i);
+	else if (c == 'X')
+		ft_putnbr_base(va_arg(lst, unsigned int), 2, &i);
+	else if (c == '%')
+		i += ft_putchar('%');
+	return (i);
 }
 
 char	ft_is_in(char c)
@@ -142,30 +81,36 @@ int	ft_printf(const char *str, ...)
 {
 	va_list	lst;
 	size_t	i;
+	size_t	len;
 
+	len = 0;
 	if (!str)
 		return (0);
 	i = 0;
 	va_start(lst, str);
-	while (str[i])
+	while (str[i] != '\0')
 	{
 		if (str[i] == '%' && ft_is_in(str[i + 1]) == 1)
 		{
-			ft_hub(str[i + 1], lst);
+			len = ft_hub(str[i + 1], lst, len);
 			i += 2;
 		}
 		else
 		{
-			ft_putchar(str[i]);
+			len += ft_putchar(str[i]);
 			i++;
 		}
 	}
 	va_end(lst);
-	return (1);
+	return (len);
 }
 
+
 int main()
-{	
-	printf("Printf: %u\n", 4);
-	ft_printf("My printf: %u\n", 4);
+{
+	int	a;
+	a = ft_printf("%p\n%p\n", LONG_MIN, LONG_MAX);
+	printf("Valeur de ft_printf: %d\n", a);
+	a = printf("%p\n%p\n", LONG_MIN, LONG_MAX);
+	printf("Valeur de printf: %d\n", a);
 }

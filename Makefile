@@ -1,7 +1,8 @@
-SRCS    =	ft_printf.c
+SRCS    =	ft_printf.c \
+			ft_utils.c
 OBJS    = ${SRCS:.c=.o}
 INCS    = includes
-NAME    = libft.a
+NAME    = libftprintf.a
 LIBC    = ar rc
 LIBR    = ranlib
 CC        = gcc
@@ -22,5 +23,8 @@ clean:
 
 fclean: clean
 	${RM} ${NAME}
+
+compile:
+	${CC} -fsanitize=address -g ${SRCS} && ./a.out
 
 re: fclean all
