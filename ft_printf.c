@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printf.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hubrygo <hubrygo@student.42.fr>            +#+  +:+       +#+        */
+/*   By: hugo <hugo@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 10:45:23 by hubrygo           #+#    #+#             */
-/*   Updated: 2023/04/13 17:59:56 by hubrygo          ###   ########.fr       */
+/*   Updated: 2023/04/17 11:19:29 by hugo             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ size_t	ft_put_unsigned_nbr_base(unsigned long long int nb, int i, size_t *len)
 {
 	if (nb >= 16)
 	{
-		ft_putnbr_base(nb / 16, i, len);
-		ft_putnbr_base(nb % 16, i, len);
+		ft_put_unsigned_nbr_base(nb / 16, i, len);
+		ft_put_unsigned_nbr_base(nb % 16, i, len);
 	}
 	if (nb < 16 && i == 1)
 	{
@@ -108,9 +108,11 @@ int	ft_printf(const char *str, ...)
 
 int main()
 {
-	int	a;
-	a = ft_printf("%p\n%p\n", LONG_MIN, LONG_MAX);
-	printf("Valeur de ft_printf: %d\n", a);
-	a = printf("%p\n%p\n", LONG_MIN, LONG_MAX);
-	printf("Valeur de printf: %d\n", a);
+	char	a;
+
+	a = 'd';
+	ft_printf(" %d, %d\n", 12, 15);
+	//printf("Valeur de ft_printf: %d\n", a);
+	printf(" %d, %d", 12, 15);
+	//printf("Valeur de printf: %d\n", a);
 }
